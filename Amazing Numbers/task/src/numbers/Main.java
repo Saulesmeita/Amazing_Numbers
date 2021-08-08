@@ -30,7 +30,7 @@ public class Main {
         //noinspection MalformedFormatString
         System.out
                 .printf("This number is %s.%n", number.isEven() ? "Even" : "Odd")
-                .printf("It is%s a %s number.%n", buzzProperty.hasProperty(number) ? " not" : "", buzzProperty.name())
+                .printf("It is%s a %s number.%n", buzzProperty.hasProperty(number) ? "" : " not", buzzProperty.name())
                 .printf("Explanation:%n")
                 .printf("%,d %s%n", number, explanaton);
     }
