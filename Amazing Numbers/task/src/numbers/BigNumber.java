@@ -1,20 +1,20 @@
 package numbers;
 
-import numbers.property.NumberProperty;
-
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class BigNumber extends BigInteger {
-    private static final Map<String, NumberProperty> properties = new HashMap<>();
+    public static final Map<String, Function<BigNumber, Boolean>> numberProperties = new HashMap<>();
+    private final Map<String, Boolean> properties = new HashMap<>();
 
-    private static void addProperty(NumberProperty property) {
-        properties.put(property.name(), property);
+    public static void addProperty(String name, Function<BigNumber, Boolean> property) {
+        numberProperties.put(name.toLowerCase(), property);
     }
 
     public static boolean isValidProperty(String name) {
-        return properties.containsKey(name);
+        return numberProperties.containsKey(name.toLowerCase());
     }
 
     public BigNumber(String val) {
@@ -25,8 +25,8 @@ public class BigNumber extends BigInteger {
         return this.compareTo(ZERO) > 0;
     }
 
-    public boolean isEven() {
-        return this.mod(TWO).equals(ZERO);
+    public boolean hasProperty(String name) {
+        return properties.computeIfAbsent(name, key -> numberProperties.get(key).apply(this));
     }
 
 }
