@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 public class BigNumber extends BigInteger {
@@ -30,6 +31,10 @@ public class BigNumber extends BigInteger {
 
     public boolean hasProperty(String name) {
         return properties.computeIfAbsent(name, key -> numberProperties.get(key).apply(this));
+    }
+
+    public BigNumber nextNumber() {
+        return new BigNumber(this.add(ONE).toString());
     }
 
 }
