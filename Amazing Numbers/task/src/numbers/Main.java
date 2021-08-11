@@ -17,6 +17,20 @@ public class Main {
         BigNumber.addProperty("duck", number -> number.toString().indexOf('0') > -1);
         BigNumber.addProperty("palindromic", number ->
                 new StringBuilder(number.toString()).reverse().toString().equals(number.toString()));
+        BigNumber.addProperty("gapful",
+                number -> {
+                    var digits = number.toString();
+                    if (digits.length() < 3) {
+                        return false;
+                    }
+                    var divisor = new BigInteger(digits.charAt(0) + digits.substring(digits.length() - 1));
+                    return number.mod(divisor).equals(ZERO);
+                });
+        BigNumber.addProperty("spy", number -> {
+            var product = number.toString().chars().map(Character::getNumericValue)
+                    .reduce(1, (a, b) -> a * b);
+            return product > 0 && product == number.toString().chars().map(Character::getNumericValue).sum();
+        });
     }
 
     public static void main(String[] args) {
