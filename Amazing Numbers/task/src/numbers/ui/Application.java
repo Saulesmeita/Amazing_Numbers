@@ -3,10 +3,12 @@ package numbers.ui;
 import numbers.model.BigNumber;
 
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Arrays.stream;
 import static java.util.function.Predicate.not;
 import static numbers.model.BigNumber.isNotNatural;
 
@@ -48,15 +50,23 @@ public class Application extends LocalTextInterface implements Runnable {
             return;
         }
         var length = Long.parseLong(parameters[1]);
-        Predicate<BigNumber> query = s -> true;
-        for (int i = 2; i < parameters.length; i++) {
-            if (BigNumber.isValidProperty(parameters[i])) {
-                query = query.and(BigNumber.PROPERTIES.get(parameters[i]));
-            } else {
-                printf("error.property", parameters[i], BigNumber.PROPERTIES.keySet());
-                return;
-            }
+
+        Supplier<Stream<String>> properties = () -> stream(parameters, 2, parameters.length);
+
+        var wrongProperties = properties.get()
+                .filter(not(BigNumber::isValidProperty))
+                .collect(Collectors.toSet());
+
+        if (!wrongProperties.isEmpty()) {
+            var errorMessage = wrongProperties.size() == 1 ? "error.is" : "error.are";
+            printf(errorMessage, wrongProperties);
+            printf("available", BigNumber.PROPERTIES.keySet());
+            return;
         }
+        Predicate<BigNumber> query = properties.get()
+                .map(BigNumber.PROPERTIES::get)
+                .reduce(s -> true, Predicate::and);
+
         Stream.iterate(number, BigNumber::nextNumber)
                 .filter(query)
                 .limit(length)

@@ -26,11 +26,14 @@ public class Main {
                     var divisor = new BigInteger(digits.charAt(0) + digits.substring(digits.length() - 1));
                     return number.mod(divisor).equals(ZERO);
                 });
-        BigNumber.addProperty("spy", number -> {
-            var product = number.toString().chars().map(Character::getNumericValue)
-                    .reduce(1, (a, b) -> a * b);
-            return product > 0 && product == number.toString().chars().map(Character::getNumericValue).sum();
-        });
+        BigNumber.addProperty("spy",
+                number -> {
+                    var product = number.toString().chars().map(Character::getNumericValue)
+                            .reduce(1, (a, b) -> a * b);
+                    return product > 0 && product == number.toString().chars().map(Character::getNumericValue).sum();
+                });
+        BigNumber.addProperty("square", number -> number.sqrtAndRemainder()[1].equals(ZERO));
+        BigNumber.addProperty("sunny", number -> number.nextNumber().sqrtAndRemainder()[1].equals(ZERO));
     }
 
     public static void main(String[] args) {
