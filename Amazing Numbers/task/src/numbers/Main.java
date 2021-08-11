@@ -23,9 +23,14 @@ public class Main {
                     if (digits.length() < 3) {
                         return false;
                     }
-                    var gapful = new BigInteger(digits.charAt(0) + digits.substring(digits.length() - 1));
-                    return number.mod(gapful).equals(ZERO);
+                    var divisor = new BigInteger(digits.charAt(0) + digits.substring(digits.length() - 1));
+                    return number.mod(divisor).equals(ZERO);
                 });
+        BigNumber.addProperty("spy", number -> {
+            var product = number.toString().chars().map(Character::getNumericValue)
+                    .reduce(1, (a, b) -> a * b);
+            return product > 0 && product == number.toString().chars().map(Character::getNumericValue).sum();
+        });
     }
 
     public static void main(String[] args) {

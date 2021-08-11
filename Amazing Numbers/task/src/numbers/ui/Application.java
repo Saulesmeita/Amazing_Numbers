@@ -2,12 +2,13 @@ package numbers.ui;
 
 import numbers.model.BigNumber;
 
-import java.math.BigInteger;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.function.Predicate.not;
+import static numbers.model.BigNumber.isNotNatural;
 
 public class Application extends LocalTextInterface implements Runnable {
     private static final Pattern DELIMITER = Pattern.compile("\\s");
@@ -32,33 +33,47 @@ public class Application extends LocalTextInterface implements Runnable {
             printf("instructions");
             return;
         }
-        var numbers = DELIMITER.split(request);
-        if (!BigNumber.isNatural(numbers[0])) {
+        var parameters = DELIMITER.split(request);
+        if (isNotNatural(parameters[0])) {
             printf("error.first");
             return;
         }
-        var number = new BigNumber(numbers[0]);
-        if (numbers.length == 1) {
-            printProperties(new BigNumber(request));
+        var number = new BigNumber(parameters[0]);
+        if (parameters.length == 1) {
+            printCard(new BigNumber(request));
             return;
         }
-        if (!BigNumber.isNatural(numbers[1])) {
+        if (isNotNatural(parameters[1])) {
             printf("error.second");
             return;
         }
-        var length = Long.parseLong(numbers[1]);
-        for (int i = Integer.parseInt(numbers[1]); i-- > 0; number = number.nextNumber()) {
-            var properties = BigNumber.numberProperties.keySet()
-                    .stream()
-                    .filter(number::hasProperty)
-                    .collect(Collectors.joining(", "));
-            printf("line.format", number, properties);
+        var length = Long.parseLong(parameters[1]);
+        Predicate<BigNumber> query = s -> true;
+        for (int i = 2; i < parameters.length; i++) {
+            if (BigNumber.isValidProperty(parameters[i])) {
+                query = query.and(BigNumber.PROPERTIES.get(parameters[i]));
+            } else {
+                printf("error.property", parameters[i], BigNumber.PROPERTIES.keySet());
+                return;
+            }
         }
+        Stream.iterate(number, BigNumber::nextNumber)
+                .filter(query)
+                .limit(length)
+                .forEach(this::printList);
     }
 
-    private void printProperties(BigNumber number) {
+    private void printList(BigNumber number) {
+        var properties = BigNumber.PROPERTIES.keySet()
+                .stream()
+                .filter(number::hasProperty)
+                .collect(Collectors.joining(", "));
+        printf("line.format", number, properties);
+    }
+
+    private void printCard(BigNumber number) {
         printf("properties", number);
-        BigNumber.numberProperties.keySet().forEach(property ->
+        BigNumber.PROPERTIES.keySet().forEach(property ->
                 printf("property", property, number.hasProperty(property)));
     }
 }
