@@ -10,8 +10,8 @@ public class Application extends LocalTextInterface implements Runnable {
 
     @Override
     public void run() {
-        println("welcome");
-        println("instructions");
+        printf("welcome");
+        printf("instructions");
 
         Stream.generate(this::getRequest)
                 .takeWhile(not("0"::equals))
@@ -19,7 +19,7 @@ public class Application extends LocalTextInterface implements Runnable {
     }
 
     private String getRequest() {
-        print("prompt");
+        printf("prompt");
         return scanner.nextLine().toLowerCase();
     }
 
@@ -27,7 +27,7 @@ public class Application extends LocalTextInterface implements Runnable {
         if (BigNumber.isNatural(request)) {
             printProperties(new BigNumber(request));
         } else {
-            println("error");
+            printf("error");
         }
     }
 
