@@ -1,6 +1,6 @@
 package numbers.ui;
 
-import numbers.model.NumberProperties;
+import numbers.Properties;
 
 import java.math.BigInteger;
 import java.util.function.Predicate;
@@ -12,14 +12,14 @@ import static java.math.BigInteger.ONE;
 import static java.util.Arrays.stream;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
-import static numbers.model.NumberProperties.isNotNatural;
+import static numbers.Properties.isNotNatural;
 
 public class Application extends LocalTextInterface implements Runnable {
     private static final Pattern DELIMITER = Pattern.compile("\\s");
-    private final NumberProperties numberProperties;
+    private final Properties properties;
 
-    public Application(NumberProperties numberProperties) {
-        this.numberProperties = numberProperties;
+    public Application(Properties properties) {
+        this.properties = properties;
     }
 
     @Override
@@ -61,36 +61,36 @@ public class Application extends LocalTextInterface implements Runnable {
                 .collect(Collectors.toUnmodifiableSet());
 
         var wrongProperties = params.stream()
-                .filter(not(numberProperties::hasProperty))
+                .filter(not(properties::hasProperty))
                 .collect(Collectors.toUnmodifiableSet());
 
         if (!wrongProperties.isEmpty()) {
             var errorMessage = wrongProperties.size() == 1 ? "error.is" : "error.are";
             printf(errorMessage, wrongProperties);
-            printf("available", numberProperties);
+            printf("available", properties);
             return;
         }
 
-        var mutuallyExclusive = numberProperties.getMutuallyExclusive(params);
+        var mutuallyExclusive = properties.getMutuallyExclusive(params);
         if (!mutuallyExclusive.isEmpty()) {
             printf("error.mutuallyExclusive", mutuallyExclusive);
             return;
         }
         Predicate<BigInteger> query = params.stream()
-                .map(numberProperties::get)
+                .map(properties::get)
                 .reduce(s -> true, Predicate::and);
 
         var length = Long.parseLong(parameters[1]);
 
         Stream.iterate(number, ONE::add)
-                .map(n -> numberProperties.new Tester(n))
+                .map(n -> properties.new Tester(n))
                 .filter(tester -> tester.testAll(params))
                 .limit(length)
                 .forEach(this::printList);
     }
 
-    private void printList(NumberProperties.Tester tester) {
-        var properties = numberProperties.keySet()
+    private void printList(Properties.Tester tester) {
+        var properties = this.properties.keySet()
                 .stream()
                 .filter(tester)
                 .collect(joining(", "));
@@ -99,7 +99,7 @@ public class Application extends LocalTextInterface implements Runnable {
 
     private void printCard(BigInteger number) {
         printf("properties", number);
-        var tester = numberProperties.new Tester(number);
-        numberProperties.keySet().forEach(property -> printf("property", property, tester.test(property)));
+        var tester = properties.new Tester(number);
+        properties.keySet().forEach(property -> printf("property", property, tester.test(property)));
     }
 }
