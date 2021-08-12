@@ -1,17 +1,26 @@
 package numbers.ui;
 
-import numbers.model.BigNumber;
+import numbers.model.NumberProperties;
 
+import java.math.BigInteger;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.math.BigInteger.ONE;
+import static java.util.Arrays.stream;
 import static java.util.function.Predicate.not;
-import static numbers.model.BigNumber.isNotNatural;
+import static java.util.stream.Collectors.joining;
+import static numbers.model.NumberProperties.isNotNatural;
 
 public class Application extends LocalTextInterface implements Runnable {
     private static final Pattern DELIMITER = Pattern.compile("\\s");
+    private final NumberProperties numberProperties;
+
+    public Application(NumberProperties numberProperties) {
+        this.numberProperties = numberProperties;
+    }
 
     @Override
     public void run() {
@@ -38,42 +47,59 @@ public class Application extends LocalTextInterface implements Runnable {
             printf("error.first");
             return;
         }
-        var number = new BigNumber(parameters[0]);
+        var number = new BigInteger(parameters[0]);
         if (parameters.length == 1) {
-            printCard(new BigNumber(request));
+            printCard(new BigInteger(request));
             return;
         }
         if (isNotNatural(parameters[1])) {
             printf("error.second");
             return;
         }
-        var length = Long.parseLong(parameters[1]);
-        Predicate<BigNumber> query = s -> true;
-        for (int i = 2; i < parameters.length; i++) {
-            if (BigNumber.isValidProperty(parameters[i])) {
-                query = query.and(BigNumber.PROPERTIES.get(parameters[i]));
-            } else {
-                printf("error.property", parameters[i], BigNumber.PROPERTIES.keySet());
-                return;
-            }
+
+        var params = stream(parameters, 2, parameters.length)
+                .collect(Collectors.toUnmodifiableSet());
+
+        var wrongProperties = params.stream()
+                .filter(not(numberProperties::hasProperty))
+                .collect(Collectors.toUnmodifiableSet());
+
+        if (!wrongProperties.isEmpty()) {
+            var errorMessage = wrongProperties.size() == 1 ? "error.is" : "error.are";
+            printf(errorMessage, wrongProperties);
+            printf("available", numberProperties);
+            return;
         }
-        Stream.iterate(number, BigNumber::nextNumber)
-                .filter(query)
+
+        var mutuallyExclusive = numberProperties.getMutuallyExclusive(params);
+        if (!mutuallyExclusive.isEmpty()) {
+            printf("error.mutuallyExclusive", mutuallyExclusive);
+            return;
+        }
+        Predicate<BigInteger> query = params.stream()
+                .map(numberProperties::get)
+                .reduce(s -> true, Predicate::and);
+
+        var length = Long.parseLong(parameters[1]);
+
+        Stream.iterate(number, ONE::add)
+                .map(n -> numberProperties.new Tester(n))
+                .filter(tester -> tester.testAll(params))
                 .limit(length)
                 .forEach(this::printList);
     }
 
-    private void printList(BigNumber number) {
-        var properties = BigNumber.PROPERTIES.keySet()
+    private void printList(NumberProperties.Tester tester) {
+        var properties = numberProperties.keySet()
                 .stream()
-                .filter(number::hasProperty)
-                .collect(Collectors.joining(", "));
-        printf("line.format", number, properties);
+                .filter(tester)
+                .collect(joining(", "));
+        printf("line.format", tester.getNumber(), properties);
     }
 
-    private void printCard(BigNumber number) {
+    private void printCard(BigInteger number) {
         printf("properties", number);
-        BigNumber.PROPERTIES.keySet().forEach(property ->
-                printf("property", property, number.hasProperty(property)));
+        var tester = numberProperties.new Tester(number);
+        numberProperties.keySet().forEach(property -> printf("property", property, tester.test(property)));
     }
 }

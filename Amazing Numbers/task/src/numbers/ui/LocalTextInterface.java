@@ -12,6 +12,10 @@ abstract class LocalTextInterface {
         System.out.printf(getString(key), args);
     }
 
+    String format(final String key, final Object... args) {
+        return String.format(getString(key), args);
+    }
+
     String getString(final String key) {
         return resourceBundle.containsKey(key) ? resourceBundle.getString(key) : key;
     }
