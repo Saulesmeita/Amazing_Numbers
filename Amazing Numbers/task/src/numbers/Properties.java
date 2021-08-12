@@ -1,4 +1,4 @@
-package numbers.model;
+package numbers;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -9,14 +9,14 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class NumberProperties {
+public class Properties {
     public static final char CONTRARY = '-';
     public static final Pattern NATURAL = Pattern.compile("[+]?\\d*\\d");
 
     private final Map<String, Predicate<BigInteger>> allProperties;
     private final Set<Set<String>> mutuallyExclusiveSet;
 
-    public NumberProperties() {
+    public Properties() {
         allProperties = new HashMap<>();
         mutuallyExclusiveSet = new HashSet<>();
     }
@@ -25,13 +25,20 @@ public class NumberProperties {
         return !NATURAL.matcher(value).matches();
     }
 
-    public NumberProperties put(String name, Predicate<BigInteger> predicate) {
+    public Properties put(String name, Predicate<BigInteger> predicate) {
         allProperties.put(name, predicate);
         mutuallyExclusiveSet.add(Set.of(name, CONTRARY + name));
         return this;
     }
 
-    public NumberProperties add(Set<String> mutuallyExclusive) {
+    public Properties put(Predicate<BigInteger> predicate) {
+        var name = predicate.getClass().getSimpleName().toLowerCase();
+        allProperties.put(name, predicate);
+        mutuallyExclusiveSet.add(Set.of(name, CONTRARY + name));
+        return this;
+    }
+
+    public Properties add(Set<String> mutuallyExclusive) {
         mutuallyExclusiveSet.add(mutuallyExclusive);
         return this;
     }
@@ -81,7 +88,7 @@ public class NumberProperties {
         @Override
         public boolean test(String name) {
             return ownProperties.computeIfAbsent(name,
-                    key -> NumberProperties.this.allProperties.get(key).test(number));
+                    key -> Properties.this.allProperties.get(key).test(number));
         }
     }
 }
