@@ -10,7 +10,7 @@ public class Buzz implements Predicate<BigInteger> {
     private static final BigInteger SEVEN = new BigInteger("7");
 
     @Override
-    public boolean test(BigInteger number) {
-        return number.mod(TEN).equals(SEVEN) || number.mod(SEVEN).equals(ZERO);
+    public boolean test(BigInteger bigInteger) {
+        return bigInteger.mod(TEN).equals(SEVEN) || bigInteger.mod(SEVEN).equals(ZERO);
     }
 }

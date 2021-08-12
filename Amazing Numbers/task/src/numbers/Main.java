@@ -3,8 +3,6 @@ package numbers;
 import numbers.property.*;
 import numbers.ui.Application;
 
-import java.util.Set;
-
 public class Main {
     public static void main(String[] args) {
         new Application(
@@ -19,9 +17,14 @@ public class Main {
                         .put(new Jumping())
                         .put(new Square())
                         .put(new Sunny())
-                        .add(Set.of("even", "odd"))
-                        .add(Set.of("sunny", "square"))
-                        .add(Set.of("spy", "duck"))
+                        .put(new Happy())
+                        .put(new Sad())
+                        .add("even", "odd")
+                        .add("sunny", "square")
+                        .add("spy", "duck")
+                        .add("happy", "sad")
+                        .add("-even", "-odd")
+                        .add("-happy", "-sad")
         ).run();
     }
 

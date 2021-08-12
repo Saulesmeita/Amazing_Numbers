@@ -37,6 +37,11 @@ public class Properties {
         return this;
     }
 
+    public Properties add(String... mutuallyExclusive) {
+        mutuallyExclusiveSet.add(Set.of(mutuallyExclusive));
+        return this;
+    }
+
     public boolean hasProperty(String name) {
         return allProperties.containsKey(name) || allProperties.containsKey(CONTRARY + name);
     }

@@ -3,19 +3,21 @@ package numbers.property;
 import java.math.BigInteger;
 import java.util.function.Predicate;
 
+import static java.math.BigInteger.TEN;
+
 public class Jumping implements Predicate<BigInteger> {
     @Override
     public boolean test(BigInteger bigInteger) {
-        var previous = bigInteger.mod(BigInteger.TEN);
-        var rest = bigInteger.divide(BigInteger.TEN);
-        while (rest.compareTo(BigInteger.ZERO) > 0) {
-            var current = rest.mod(BigInteger.TEN);
+        var previous = bigInteger.mod(TEN);
+        var rest = bigInteger.divide(TEN);
+        while (!rest.equals(BigInteger.ZERO)) {
+            var current = rest.mod(TEN);
             var difference = current.subtract(previous).abs();
-            if (difference.compareTo(BigInteger.ONE) != 0) {
+            if (!difference.equals(BigInteger.ONE)) {
                 return false;
             }
             previous = current;
-            rest = rest.divide(BigInteger.TEN);
+            rest = rest.divide(TEN);
         }
         return true;
     }

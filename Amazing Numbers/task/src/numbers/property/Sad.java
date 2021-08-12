@@ -3,9 +3,9 @@ package numbers.property;
 import java.math.BigInteger;
 import java.util.function.Predicate;
 
-public class Duck implements Predicate<BigInteger> {
+public class Sad implements Predicate<BigInteger> {
     @Override
     public boolean test(BigInteger bigInteger) {
-        return bigInteger.toString().indexOf('0') > -1;
+        return false;
     }
 }
