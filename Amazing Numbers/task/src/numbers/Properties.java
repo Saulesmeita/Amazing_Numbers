@@ -25,12 +25,6 @@ public class Properties {
         return !NATURAL.matcher(value).matches();
     }
 
-    public Properties put(String name, Predicate<BigInteger> predicate) {
-        allProperties.put(name, predicate);
-        mutuallyExclusiveSet.add(Set.of(name, CONTRARY + name));
-        return this;
-    }
-
     public Properties put(Predicate<BigInteger> predicate) {
         var name = predicate.getClass().getSimpleName().toLowerCase();
         allProperties.put(name, predicate);
