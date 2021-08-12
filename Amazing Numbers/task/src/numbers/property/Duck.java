@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 
 public class Duck implements Predicate<BigInteger> {
     @Override
-    public boolean test(BigInteger number) {
-        return number.toString().indexOf('0') > -1;
+    public boolean test(BigInteger bigInteger) {
+        return bigInteger.toString().indexOf('0') > -1;
     }
 }

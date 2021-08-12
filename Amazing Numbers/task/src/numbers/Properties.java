@@ -32,25 +32,25 @@ public class Properties {
         return this;
     }
 
-    public Properties add(Set<String> mutuallyExclusive) {
-        mutuallyExclusiveSet.add(mutuallyExclusive);
+    public Properties add(String... mutuallyExclusive) {
+        mutuallyExclusiveSet.add(Set.of(mutuallyExclusive));
         return this;
     }
 
     public boolean hasProperty(String name) {
-        return allProperties.containsKey(name) || allProperties.containsKey(CONTRARY + name);
+        return isContraryProperty(name)
+                ? allProperties.containsKey(name.substring(1))
+                : allProperties.containsKey(name);
+    }
+
+    public boolean isContraryProperty(String name) {
+        return name.length() > 0 && name.charAt(0) == CONTRARY;
     }
 
     public Set<Set<String>> getMutuallyExclusive(Set<String> properties) {
         return mutuallyExclusiveSet.stream()
                 .filter(properties::containsAll)
                 .collect(Collectors.toUnmodifiableSet());
-    }
-
-    public Predicate<BigInteger> get(String name) {
-        return name.charAt(0) == CONTRARY
-                ? allProperties.get(name.substring(1)).negate()
-                : allProperties.get(name);
     }
 
     public Set<String> keySet() {
@@ -81,8 +81,11 @@ public class Properties {
 
         @Override
         public boolean test(String name) {
-            return ownProperties.computeIfAbsent(name,
+            var isContrary = isContraryProperty(name);
+            var property = isContrary ? name.substring(1) : name;
+            var isPresent = ownProperties.computeIfAbsent(property,
                     key -> Properties.this.allProperties.get(key).test(number));
+            return isContrary != isPresent;
         }
     }
 }
