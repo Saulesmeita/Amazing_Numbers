@@ -1,4 +1,4 @@
-package numbers.model;
+package numbers.property;
 
 import java.math.BigInteger;
 import java.util.function.Predicate;
