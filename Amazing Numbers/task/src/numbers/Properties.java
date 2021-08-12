@@ -32,11 +32,6 @@ public class Properties {
         return this;
     }
 
-    public Properties add(Set<String> mutuallyExclusive) {
-        mutuallyExclusiveSet.add(mutuallyExclusive);
-        return this;
-    }
-
     public Properties add(String... mutuallyExclusive) {
         mutuallyExclusiveSet.add(Set.of(mutuallyExclusive));
         return this;

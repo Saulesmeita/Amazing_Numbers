@@ -3,7 +3,6 @@ package numbers.ui;
 import numbers.Properties;
 
 import java.math.BigInteger;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -76,9 +75,6 @@ public class Application extends LocalTextInterface implements Runnable {
             printf("error.mutuallyExclusive", mutuallyExclusive);
             return;
         }
-        Predicate<BigInteger> query = params.stream()
-                .map(properties::get)
-                .reduce(s -> true, Predicate::and);
 
         var length = Long.parseLong(parameters[1]);
 
